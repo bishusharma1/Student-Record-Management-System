@@ -23,16 +23,15 @@ typedef struct {
 } Credential;
 
 typedef struct {
-    int id;                 // user-entered ID
+    int id;                 
     char name[100];
     char gender[10];
     int physics;
     int chemistry;
     int math;
-    char grade[4];          // auto-calculated e.g., A+, A, B+
+    char grade[4];          
 } Student;
 
-/* Portable password masking */
 void get_password(const char *prompt, char *out, size_t maxlen) {
     printf("%s", prompt);
     fflush(stdout);
@@ -41,9 +40,9 @@ void get_password(const char *prompt, char *out, size_t maxlen) {
 #ifdef _WIN32
     int ch;
     while ((ch = _getch()) != '\r' && ch != '\n') {
-        if (ch == 8) { // backspace
+        if (ch == 8) { 
             if (idx) { idx--; printf("\b \b"); fflush(stdout); }
-        } else if (ch == 3) { // ctrl-c
+        } else if (ch == 3) {
             exit(1);
         } else if (idx + 1 < maxlen) {
             out[idx++] = (char)ch;
@@ -60,7 +59,7 @@ void get_password(const char *prompt, char *out, size_t maxlen) {
 
     int ch;
     while ((ch = getchar()) != '\n' && ch != EOF) {
-        if (ch == 127 || ch == '\b') { // backspace
+        if (ch == 127 || ch == '\b') {
             if (idx) { idx--; printf("\b \b"); fflush(stdout); }
         } else if (idx + 1 < maxlen) {
             out[idx++] = (char)ch;
@@ -75,7 +74,6 @@ void get_password(const char *prompt, char *out, size_t maxlen) {
     printf("\n");
 }
 
-/* Credentials */
 int load_credentials(Credential creds[], int *count) {
     FILE *f = fopen(CRED_FILE, "r");
     if (!f) return 0;
@@ -99,7 +97,6 @@ int load_credentials(Credential creds[], int *count) {
     return 1;
 }
 
-/* Students: id,name,gender,physics,chemistry,math,grade */
 int load_students(Student arr[], int *n) {
     FILE *f = fopen(STUD_FILE, "r");
     if (!f) { *n = 0; return 0; }
@@ -157,7 +154,7 @@ int save_students(Student arr[], int n) {
     return 1;
 }
 
-/* Helpers */
+
 void flush_stdin(void) {
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {}
@@ -171,7 +168,7 @@ void print_student(const Student *s) {
            s->grade);
 }
 
-/* compute grade from average */
+
 void compute_grade(Student *s) {
     double avg = (s->physics + s->chemistry + s->math) / 3.0;
     if (avg >= 90.0) strncpy(s->grade, "A+", sizeof(s->grade)-1);
@@ -183,7 +180,7 @@ void compute_grade(Student *s) {
     s->grade[sizeof(s->grade)-1] = '\0';
 }
 
-/* case-insensitive substring */
+
 int ci_substr(const char *hay, const char *needle) {
     if (!needle || !*needle) return 1;
     size_t hn = strlen(hay), nn = strlen(needle);
@@ -198,7 +195,6 @@ int ci_substr(const char *hay, const char *needle) {
     return 0;
 }
 
-/* finders */
 int find_student_index_by_id(Student arr[], int n, int id) {
     for (int i = 0; i < n; ++i) if (arr[i].id == id) return i;
     return -1;
@@ -215,7 +211,7 @@ int find_students_by_name(Student arr[], int n, const char *name_sub, int indice
     return count;
 }
 
-/* Validation for marks */
+
 int read_mark(const char *prompt, int *out_mark) {
     int m;
     printf("%s", prompt);
@@ -226,7 +222,7 @@ int read_mark(const char *prompt, int *out_mark) {
     return 1;
 }
 
-/* CRUD */
+
 void add_student() {
     Student arr[MAX_STUDENTS];
     int n = 0;
@@ -312,7 +308,7 @@ void update_student() {
         strncpy(arr[idx].gender, tmp, sizeof(arr[idx].gender)-1);
     }
 
-    /* Optionally allow recalculation by entering new marks */
+    
     printf("Do you want to update marks? (y/n): ");
     char chg = getchar(); flush_stdin();
     if (chg == 'y' || chg == 'Y') {
@@ -351,7 +347,7 @@ void delete_student() {
     }
 }
 
-/* Improved search */
+
 void search_student() {
     Student arr[MAX_STUDENTS];
     int n = 0;
@@ -399,7 +395,6 @@ void view_all_students() {
     }
 }
 
-/* Staff-only: update marks (asks one by one) */
 void update_marks() {
     Student arr[MAX_STUDENTS];
     int n = 0;
@@ -443,7 +438,7 @@ void update_marks() {
     else printf("Failed to save.\n");
 }
 
-/* Admin: add user */
+
 void add_user() {
     char uname[50], pwd[50], role[10];
     printf("Enter new username: ");
@@ -458,7 +453,7 @@ void add_user() {
     printf("User added.\n");
 }
 
-/* Menus */
+
 void admin_menu() {
     int opt;
     do {
@@ -561,7 +556,7 @@ void user_menu() {
     } while (opt != 0);
 }
 
-/* Login */
+
 void login_prompt() {
     Credential creds[MAX_USERS];
     int credCount = 0;
@@ -622,3 +617,4 @@ int main() {
     } while (opt != 0);
     return 0;
 }
+
